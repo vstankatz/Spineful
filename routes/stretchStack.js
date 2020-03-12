@@ -30,8 +30,8 @@ const HomeStack = createStackNavigator(screens, {
         headerTintColor: '#444',
         headerBackTitle: 'Back',
         headerBackTitleStyle: {
-            fontSize: 12
-            color:
+            fontSize: 12,
+            color: 'red'
         },
         headerStyle: {
             backgroundColor: "rgba(252,70,107,1)",
