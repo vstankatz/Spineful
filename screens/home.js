@@ -17,7 +17,7 @@ export default function Home({ navigation }) {
             <View>
                 <Text style={styles.second}>Spineful aims to make people more aware of the damage they're doing to themselves with their daily phone usage.</Text>
             </View>
-            <Button title='Check Your Neck Weight' onPress={() => navigation.navigate("Data")}></Button>
+            <Button title='Check Your Spine Pressure' onPress={() => navigation.navigate("Data")}></Button>
             <View>
                 <Text style={styles.source}> The data used to create this app is based off of the Assessment of Stresses in the Cervical Spine Caused by Posture and Position of the Head by K.K. Hansraj, MD, Chief of Spine Surgery - New York Spine Surgery & Rehabilitation Medicine
                  </Text>
