@@ -1,7 +1,7 @@
 import { createStackNavigator } from 'react-navigation-stack';
 import { createAppContainer } from 'react-navigation';
-import Pain from '../screens/pain';
-import Stretch from '../screens/stretch';
+import Pain from '../screens/painManagement';
+import Stretch from '../screens/stretches';
 import Header from '../shared/header';
 import React from 'react';
 
@@ -10,7 +10,7 @@ const screens = {
         screen: Pain,
         navigationOptions: ({ navigation }) => {
             return {
-                headerTitle: () => <Header navigation={navigation} title="Pain" />
+                headerTitle: () => <Header navigation={navigation} title="Stretches" />
             };
         }
     },
@@ -30,13 +30,14 @@ const HomeStack = createStackNavigator(screens, {
         headerTintColor: '#444',
         headerBackTitle: 'Back',
         headerBackTitleStyle: {
-            fontSize: 12,
-            color: 'red'
+            fontSize: 14,
+            color: 'white'
         },
         headerStyle: {
             backgroundColor: "rgba(252,70,107,1)",
-            height: 60
-        }
+            height: 60,
+        },
+        headerTintColor: 'white'
     }
 });
 
