@@ -17,14 +17,16 @@ export default function PainMagagement({ navigation }) {
 
     return (
         <View style={globalStyles.container}>
-            <Text>The main thing to keep in mind when dealing with neck pain is that less is more. Any excercise or stretch should be done into slowly and never to a point you experience more pain. If pain persists or prevents you from moving please consult a medical professional at once.</Text>
+            <Text style={globalStyles.paragraph}>The main thing to keep in mind when dealing with neck pain is that<Text style={styles.bold}> less is more.</Text> Any excercise or stretch should be done into slowly and never to a point you experience more pain. If pain persists or prevents you from moving please <Text style={styles.bold}>consult a medical professional at once</Text>.</Text>
+            <Text style={styles.title}>Low Impact Stretches</Text>
             <FlatList
                 data={stretches}
+                scrollEnabled={false}
                 renderItem={({ item }) => (
                     <TouchableOpacity
                         onPress={() => navigation.navigate("HeresStretch", item)}
                     >
-                        <Text>{item.title}</Text>
+                        <Text style={styles.list}>{item.title}</Text>
                     </TouchableOpacity>
                 )}
             />
@@ -32,3 +34,24 @@ export default function PainMagagement({ navigation }) {
     );
 }
 
+const styles = StyleSheet.create({
+    bold: {
+        fontWeight: 'bold',
+        color: 'black'
+    },
+    list: {
+        padding: 10,
+        fontSize: 12,
+        textAlign: 'center',
+        fontFamily: 'groovy',
+        color: 'purple'
+ 
+    },
+    title: {
+        fontFamily: 'groovy',
+        fontSize: 20,
+        textAlign: 'center',
+        textDecorationLine: 'underline',
+        color: 'dimgrey'
+    }
+})
