@@ -13,7 +13,7 @@ _This application was designed to show users the damage they're doing to their s
 ## Specs
 
 <p align='center'>
-<img align="center" width="350" height="568" src="./assets/images/loading.GIF"> <img align="center" width="350" height="568" src="./assets/images/stretches.GIF"> <img align="center" width="350" height="568" src="./assets/images/source.GIF"> <img align="center" width="350" height="568" src="./assets/images/dataGif.GIF"> 
+<img align="center" width="200" height="325" src="./assets/images/loading.GIF"> <img align="center" width="200" height="325" src="./assets/images/stretches.GIF"> <img align="center" width="200" height="325" src="./assets/images/source.GIF"> <img align="center" width="200" height="325" src="./assets/images/dataGif.GIF"> 
 <br> Loading & Home Screen   |   Drawer Navigation & Stretches    |  Sources | Data of Pressure on Neck
 </p>
 
