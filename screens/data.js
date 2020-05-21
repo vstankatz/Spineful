@@ -1,297 +1,290 @@
 import React, { useState, useEffect, Component } from "react";
-import { StyleSheet, Text, FlatList,  AppState, View } from "react-native";
+import { StyleSheet, Text, FlatList, AppState, View } from "react-native";
 import { Accelerometer } from "expo-sensors";
-import { ScreenOrientation } from 'expo';
-
+import { ScreenOrientation } from "expo";
 
 export default class Data extends Component {
-    state = {
-        accelerometerData: {},
-        isAccelerometerAvailable: "checking",
-        screenOrientation: 'checking',
-        appState: AppState.currentState,
-        isScreenOrientationAvailable: 'checking'
-    };
+  state = {
+    accelerometerData: {},
+    isAccelerometerAvailable: "checking",
+    screenOrientation: "checking",
+    appState: AppState.currentState,
+    isScreenOrientationAvailable: "checking",
+  };
 
-    componentDidMount() {
-        this._subscribe();
-        this.isAccelerometerAvailable();
-        this.isScreenOrientationAvailable();
-        AppState.addEventListener('change', this._handleAppState);
-        //  this.getOrientation();
+  componentDidMount() {
+    this._subscribe();
+    this.isAccelerometerAvailable();
+    this.isScreenOrientationAvailable();
+    AppState.addEventListener("change", this._handleAppState);
+    //  this.getOrientation();
+  }
+
+  componentWillUnmount() {
+    this._unsubscribe();
+    AppState.removeEventListener("change", this._handleAppState);
+  }
+
+  _handleAppState = (nextAppState) => {
+    if (
+      this.state.appState.match(/inactive|background/) &&
+      nextAppState === "active"
+    ) {
+      console.log("App is in the foreground");
     }
+    this.setState({ appState: nextAppState });
+  };
 
-    componentWillUnmount() {
-        this._unsubscribe();
-        AppState.removeEventListener("change", this._handleAppState);
-
+  _toggle = () => {
+    if (this._subscription) {
+      this._unsubscribe();
+    } else {
+      this._subscribe();
     }
+  };
 
-    _handleAppState = nextAppState => {
-        if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-            console.log('App is in the foreground');
-        }
-        this.setState({ appState: nextAppState })
-    };
-
-    _toggle = () => {
-        if (this._subscription) {
-            this._unsubscribe();
-        } else {
-            this._subscribe();
-        }
-    };
-
-    isAccelerometerAvailable() {
-        Accelerometer.isAvailableAsync().then(
-            result => {
-                this.setState({
-                    isAccelerometerAvailable: String(result)
-                });
-            },
-            error => {
-                this.setState({
-                    isAccelerometerAvailable:
-                        "Could not get isAvailable: " + error
-                });
-            }
-        );
-    }
-
-    isScreenOrientationAvailable() {
-        ScreenOrientation.getOrientationAsync().then(
-            result => {
-
-                this.setState({
-                    screenOrientation: String(result.orientation)
-                });
-            },
-            error => {
-                this.setState({
-                    isScreenOrientationAvailable:
-                        "Could not get screen orientation: " + error
-                });
-            }
-        );
-    }
-
-    _slow = () => {
-        Accelerometer.setUpdateInterval(1000);
-    };
-
-    _fast = () => {
-        Accelerometer.setUpdateInterval(16);
-    };
-
-    _subscribe = () => {
-        this._subscription = Accelerometer.addListener(
-            accelerometerData => {
-                this.setState({ accelerometerData });
-            }
-        );
-        console.log('Mounted');
-    };
-
-    getOrientation = () => {
-        ScreenOrientation.OrientationChangeListener().then(result => {
-            this.setState({
-                screenOrientation: String(result)
-            })
-        })
-    }
-
-    _unsubscribe = () => {
-        this._subscription && this._subscription.remove();
-        this._subscription = null;
-        console.log('UNMOUNTED');
-        
-    };
-
-    render() {
-        let { x, y, z } = this.state.accelerometerData;
-   
-        const styles = StyleSheet.create({
-            color: {
-                height: "100%",
-                width: "100%",
-                padding: 20,
-                textAlign: 'center',
-            },
-            font: {
-                color: "white",
-                fontSize: 20,
-            },
-            weight: {
-                fontSize: 20,
-                color: 'white',
-                paddingTop: 20,
-                textAlign: 'center'
-            },
-            warning: {
-                fontSize: 20,
-                color: 'white',
-                textAlign: 'center',
-                paddingTop: 20
-            }
+  isAccelerometerAvailable() {
+    Accelerometer.isAvailableAsync().then(
+      (result) => {
+        this.setState({
+          isAccelerometerAvailable: String(result),
         });
+      },
+      (error) => {
+        this.setState({
+          isAccelerometerAvailable: "Could not get isAvailable: " + error,
+        });
+      }
+    );
+  }
 
+  isScreenOrientationAvailable() {
+    ScreenOrientation.getOrientationAsync().then(
+      (result) => {
+        this.setState({
+          screenOrientation: String(result.orientation),
+        });
+      },
+      (error) => {
+        this.setState({
+          isScreenOrientationAvailable:
+            "Could not get screen orientation: " + error,
+        });
+      }
+    );
+  }
 
-        if (z < -0.7) {
-            styles.color ={
-                backgroundColor: 'black',
-                height: "100%",
-                width: "100%",
-                padding: 20
-            }
-            return (
+  _slow = () => {
+    Accelerometer.setUpdateInterval(1000);
+  };
 
-                <View style={styles.color}>
-                    <Text style={styles.font}>
-                        Depending on the tilt of your phone here is the estimated pressure put on your spine:
-                         </Text>
-                    <Text style={styles.weight}>
-                        60lbs
-                    </Text>
-                    <Text style={styles.warning}>This is the maximum measurable force you can place on your spine from poor posture. Please stretch.</Text>
-                </View>
-            );
-        }
-        if (z < -0.58 && y < 0) {
-            styles.color = {
-                backgroundColor: 'red',
-                height: "100%",
-                width: "100%",
-                padding: 20
-            }
+  _fast = () => {
+    Accelerometer.setUpdateInterval(16);
+  };
 
-            return (
-                <View style={styles.color}>
-                    <Text style={styles.font}>
-                        Depending on the tilt of your phone here is the estimated pressure put on your spine:
-                         </Text>
-                    <Text style={styles.weight}>
-                        49lbs
-                    </Text>
-                    <Text style={styles.warning}>An average elephant heart only weighs 44lbs, currently to your spine your head weighs more.</Text>
-                </View>
-            );
-        }
+  _subscribe = () => {
+    this._subscription = Accelerometer.addListener((accelerometerData) => {
+      this.setState({ accelerometerData });
+    });
+    console.log("Mounted");
+  };
 
-        if (z < -0.42 && y < 0) {
-            styles.color = {
-                backgroundColor: 'pink',
-                height: "100%",
-                width: "100%",
-                padding: 20
-            }
+  getOrientation = () => {
+    ScreenOrientation.OrientationChangeListener().then((result) => {
+      this.setState({
+        screenOrientation: String(result),
+      });
+    });
+  };
 
-            return (
-                <View style={styles.color}>
-                    <Text style={styles.font}>
-                        Depending on the tilt of your phone here is the estimated pressure put on your spine:
-                         </Text>
-                    <Text style={styles.weight}>
-                        30lbs
-                    </Text>
-                    <Text style={styles.warning}>Watch the shoulder slouch!</Text>
-                </View>
-            );
-        }
+  _unsubscribe = () => {
+    this._subscription && this._subscription.remove();
+    this._subscription = null;
+    console.log("UNMOUNTED");
+  };
 
-        if (z < -0.27 && y < 0) {
-            styles.color = {
-                backgroundColor: 'orange',
-                height: "100%",
-                width: "100%",
-                padding: 20
-            }
-            return (
-                <View style={styles.color}>
-                    <Text style={styles.font}>
-                        Depending on the tilt of your phone here is the estimated pressure put on your spine:
-                         </Text>
-                    <Text style={styles.weight}>
-                        27 lbs
-                    </Text>
-                    <Text style={styles.warning}>Your neck is only at a slight angle and yet the weight on your spine has doubled compared to proper posture.</Text>
-                </View>
-            );
-        }
+  render() {
+    let { x, y, z } = this.state.accelerometerData;
 
-        if (z < 0.2 && y < 0) {
-            styles.color = {
-                backgroundColor: 'green',
-                height: "100%",
-                width: "100%",
-                padding: 20
-            }
+    const styles = StyleSheet.create({
+      color: {
+        height: "100%",
+        width: "100%",
+        padding: 20,
+        textAlign: "center",
+      },
+      font: {
+        color: "white",
+        fontSize: 20,
+      },
+      weight: {
+        fontSize: 20,
+        color: "white",
+        paddingTop: 20,
+        textAlign: "center",
+      },
+      warning: {
+        fontSize: 20,
+        color: "white",
+        textAlign: "center",
+        paddingTop: 20,
+      },
+    });
 
-            return (
-                <View style={styles.color}>
-                    <Text style={styles.font}>
-                        Depending on the tilt of your phone here is the estimated pressure put on your spine:
-                         </Text>
-                    <Text style={styles.weight}>
-                        10 - 12lbs
-                    </Text>
-                    <Text style={styles.warning}>
-                        The average weight of the head.
-                    </Text>
-                </View>
-            );
-        } else {
-            styles.font = {
-                color: "black",
-                fontSize: 20,
-                textAlign: 'center'
-            }
-            styles.weight = {
-                fontSize: 20,
-                color: 'black',
-                paddingTop: 20,
-                textAlign: 'center'
-            }
-            styles.warning = {
-                fontSize: 20,
-                color: 'black',
-                textAlign: 'center',
-                paddingTop: 20
-            }
-            return (
-                <View style={styles.color}>
-                    <Text style={styles.font}>
-                        Depending on the tilt of your phone here is the estimated pressure put on your spine:
-                           </Text>
-                    <Text style={styles.weight}>
-                        Not Measurable
-                    </Text>
-                </View>
-            );
-
-        }
+    if (z < -0.7) {
+      styles.color = {
+        backgroundColor: "#353636",
+        height: "100%",
+        width: "100%",
+        padding: 20,
+      };
+      return (
+        <View style={styles.color}>
+          <Text style={styles.font}>
+            Depending on the tilt of your phone here is the estimated pressure
+            put on your spine:
+          </Text>
+          <Text style={styles.weight}>60lbs</Text>
+          <Text style={styles.warning}>
+            This is the maximum measurable force you can place on your spine
+            from poor posture. Please stretch.
+          </Text>
+        </View>
+      );
     }
+    if (z < -0.58 && y < 0) {
+      styles.color = {
+        backgroundColor: "#F8798A",
+        height: "100%",
+        width: "100%",
+        padding: 20,
+      };
+
+      return (
+        <View style={styles.color}>
+          <Text style={styles.font}>
+            Depending on the tilt of your phone here is the estimated pressure
+            put on your spine:
+          </Text>
+          <Text style={styles.weight}>49lbs</Text>
+          <Text style={styles.warning}>
+            An average elephant heart only weighs 44lbs, currently to your spine
+            your head weighs more.
+          </Text>
+        </View>
+      );
+    }
+
+    if (z < -0.42 && y < 0) {
+      styles.color = {
+        backgroundColor: "#FFB07C",
+        height: "100%",
+        width: "100%",
+        padding: 20,
+      };
+
+      return (
+        <View style={styles.color}>
+          <Text style={styles.font}>
+            Depending on the tilt of your phone here is the estimated pressure
+            put on your spine:
+          </Text>
+          <Text style={styles.weight}>30lbs</Text>
+          <Text style={styles.warning}>Watch the shoulder slouch!</Text>
+        </View>
+      );
+    }
+
+    if (z < -0.27 && y < 0) {
+      styles.color = {
+        backgroundColor: "#63CBB6",
+        height: "100%",
+        width: "100%",
+        padding: 20,
+      };
+      return (
+        <View style={styles.color}>
+          <Text style={styles.font}>
+            Depending on the tilt of your phone here is the estimated pressure
+            put on your spine:
+          </Text>
+          <Text style={styles.weight}>27 lbs</Text>
+          <Text style={styles.warning}>
+            Your neck is only at a slight angle and yet the weight on your spine
+            has doubled compared to proper posture.
+          </Text>
+        </View>
+      );
+    }
+
+    if (z < 0.2 && y < 0) {
+      styles.color = {
+        backgroundColor: "#8EE972",
+        height: "100%",
+        width: "100%",
+        padding: 20,
+      };
+
+      return (
+        <View style={styles.color}>
+          <Text style={styles.font}>
+            Depending on the tilt of your phone here is the estimated pressure
+            put on your spine:
+          </Text>
+          <Text style={styles.weight}>10 - 12lbs</Text>
+          <Text style={styles.warning}>The average weight of the head.</Text>
+        </View>
+      );
+    } else {
+      styles.font = {
+        color: "black",
+        fontSize: 20,
+        textAlign: "center",
+      };
+      styles.weight = {
+        fontSize: 20,
+        color: "black",
+        paddingTop: 20,
+        textAlign: "center",
+      };
+      styles.warning = {
+        fontSize: 20,
+        color: "black",
+        textAlign: "center",
+        paddingTop: 20,
+      };
+      return (
+        <View style={styles.color}>
+          <Text style={styles.font}>
+            Depending on the tilt of your phone here is the estimated pressure
+            put on your spine:
+          </Text>
+          <Text style={styles.weight}>Not Measurable</Text>
+        </View>
+      );
+    }
+  }
 }
 
 function round(n) {
-    if (!n) {
-        return 0;
-    }
+  if (!n) {
+    return 0;
+  }
 
-    return Math.floor(n * 100) / 100;
+  return Math.floor(n * 100) / 100;
 }
-
 
 //BELOW IS THE FUNCTION METHOD
 
 // export default function Data({ navigation }) {
-            
+
 //         const [accelerometerData, setAccelerometerData] = useState({});
 //         const [isAccelerometerAvailable, setIsAccelerometerAvailable] = useState( "checking");
 //         const [isScreenOrientationAvailable, setIsScreenOrientationAvailable] = useState('checking');
 //         const [screenOrientation, setScreenOrientation] = useState( 'checking');
 //         const [appState, setAppState] = useState(AppState.currentState);
 //         const [colorState, setColorState] = useState('lightblue');
-          
+
 //          useEffect(() => {
 //         getAccelerometerData();
 //         },[])
@@ -338,8 +331,8 @@ function round(n) {
 
 //         const  getScreenOrientation = () => {
 //           ScreenOrientation.getOrientationAsync().then(
-//                result => { 
-                     
+//                result => {
+
 //                   setIsScreenOrientationAvailable( String(result.orientation)
 //                 );
 //               },
@@ -385,7 +378,7 @@ function round(n) {
 //                                  color: "purple"
 //                              }
 //                          });
-                                    
+
 //                    if (accelerometerData.z < -0.7) {
 //                        setColorState('black')
 //                        styles.color = {
@@ -431,7 +424,7 @@ function round(n) {
 //                            width: "100%",
 //                            paddingTop: 20
 //                        }
-//                     } 
+//                     }
 //                     // else {
 //                     //    styles.color = {
 //                     //        backgroundColor: 'lightblue',
@@ -440,9 +433,9 @@ function round(n) {
 //                     //         paddingTop: 20
 //                     //    }
 //                     // }
-                                   
+
 //             // let colorType = "'"+(String(Object.values({colorState })))+"'";
-                          
+
 //                     let { x, y, z } = accelerometerData;
 
 //                    return (
@@ -463,8 +456,7 @@ function round(n) {
 
 //                        </View>
 //                    );
-                 
-            
+
 //             }
 
 // function round(n) {
@@ -474,4 +466,3 @@ function round(n) {
 
 //   return Math.floor(n * 100) / 100;
 // }
-
